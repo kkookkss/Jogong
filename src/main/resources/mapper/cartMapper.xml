@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="bit.data.dao.CartDao">
+	<select id="getCartList" parameterType="int" resultType="cartListDto">
+		select p.num productNum, p.name, p.price, p.thumbnailImageUrl, p.brand, p.deliveryOption, c.num, c.qty, c.messageCard, c.engrave
+		from cartList c left outer join product p on c.productNum = p.num
+		where userNum=#{userNum} order by createdAt desc
+	</select>
+	<delete id="deleteCart" parameterType="int">
+		delete from cartList where num=#{cartNum}
+	</delete>
+	<update id="updateCart" parameterType="int">
+		update cartList set qty=#{qty} where num=#{cartNum}
+	</update>
+	<!-- 상세페이지 선물상자담기 -->
+	<insert id="insertCart" parameterType="cartListDto">
+		insert into cartList values (null,#{qty},#{messageCard},#{engrave},#{userNum},#{productNum})
+	</insert>
+</mapper>

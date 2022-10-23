@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bit.data.dao.ReviewDao">
+	
+	<!-- 리뷰 별점 -->
+	<select id="reviewRating" parameterType="int" resultType="int">
+		select ifnull(round(avg(rating),0),0) from review where productNum=#{num}
+	</select>
+	
+	<select id="reviewRatingNum" parameterType="int" resultType="int">
+		select ifnull(count(*),0) from review where productNum=#{num}
+	</select>
+	
+	<!-- 리뷰페이지(review list page) -->
+	<select id="getTotalCount" parameterType="Map" resultType="int">
+		select count(*) from review 
+		<if test="searchcolumn!=null and searchword!=null">
+			where ${searchcolumn} like concat('%',#{searchword},'%')		
+		</if>
+	</select>
+	
+	<!-- <select id="getPagingList" parameterType="Map" resultType="reviewDto">   
+		select p.name, p.thumbnailImageUrl, r.num, r.subject, r.content, r.rating, r.createdAt, r.reviewImageUrl, r.userNum, r.productNum from product p inner join review r on productNum = p.num
+		<if test="searchcolumn!=null and searchword!=null">
+			where ${searchcolumn} like concat('%',#{searchword},'%') order by createdAt desc 		
+		</if>
+		limit #{startnum}, #{perpage}
+	</select> -->
+	
+	<select id="getReviewList" resultType="reviewDto">   
+		select p.name, p.thumbnailImageUrl, r.num, r.subject, r.content, r.rating, r.createdAt, r.reviewImageUrl, r.userNum, r.productNum from product p inner join review r on productNum = p.num 
+		order by createdAt desc	
+	</select>
+	
+	<!-- 상세페이지 -->
+	<select id="getReviewByProduct" parameterType="int" resultType="reviewDto">
+		select t.content tagName, t.backgroundColor tagBColor, t.textColor tagTColor, r.subject, r.content, r.rating, r.createdAt, r.publicOption, r.reviewImageUrl, r.productNum, r.userNum, p.name, u.nickname, u.profileImage 
+		from review r inner join product p 
+		on r.productNum = p.num 
+		inner join jogong.user u 
+		on u.num = r.userNum 
+		inner join tag t 
+		on t.num = r.tagNum
+		where r.productNum = #{productNum}
+	</select>
+	
+	<!-- 상세페이지 리뷰 수 -->
+	<select id="getReviewCount" parameterType="int" resultType="int">
+		select count(*) from review r inner join product p 
+		on r.productNum = p.num 
+		where r.productNum = #{productNum}
+	</select>
+	
+	<!-- 마이페이지 작성한 리뷰목록 -->
+	<select id="selectReviewByUser" parameterType="int" resultType="reviewDto">
+		select 
+		p.name, p.thumbnailImageUrl, p.brand, 
+		r.num, r.productNum, r.subject, r.content, r.rating, r.createdAt, r.publicOption, r.tagNum, r.reviewImageUrl, 
+		t.content tagName, t.backgroundColor tagBColor, t.textColor tagTColor
+		from review r 
+		inner join product p 
+		on r.productNum = p.num
+		inner join tag t
+		on r.tagNum = t.num
+		where r.userNum=#{userNum} order by createdAt desc
+	</select>
+	
+	<!-- 마이페이지 리뷰 조회 -->
+	<select id="selectReviewByNum" parameterType="int" resultType="reviewDto">
+		select 
+		r.num,r.subject,r.content,r.rating,r.createdAt,r.publicOption,r.reviewImageUrl,r.userNum,r.productNum,r.tagNum,
+		t.content tagName,t.backgroundColor tagBColor,t.textColor tagTColor
+		from review r inner join tag t 
+		on r.tagNum = t.num 
+		where r.num=#{num} order by createdAt desc
+	</select>
+	
+	<!-- 마이페이지 작성한 리뷰 갯수 -->
+	<select id="selectReviewCount" parameterType="int" resultType="int">
+		select count(*)
+		from review r inner join product p 
+		on r.productNum = p.num 
+		where userNum=#{userNum}
+	</select>
+	
+	<!-- 리뷰 생성 -->
+	<insert id="insertReview" parameterType="reviewDto">
+		insert into review values (null,#{subject},#{content},#{rating},now(),#{publicOption},#{reviewImageUrl},#{userNum},#{productNum},#{tagNum})
+	</insert>
+	
+	<!-- 리뷰 삭제 -->
+	<delete id="deleteReview" parameterType="int">
+		delete from review where num=#{num}
+	</delete>
+	
+	<!-- 리뷰 업데이트 -->
+	<update id="updateReview" parameterType="reviewDto">
+		update review set subject=#{subject},content=#{content},rating=#{rating},publicOption=#{publicOption},tagNum=#{tagNum}
+		<if test="reviewImageUrl!=null">
+			 ,reviewImageUrl=#{reviewImageUrl}
+		</if>
+		 where num=#{num}
+	</update>
+</mapper>
+
+

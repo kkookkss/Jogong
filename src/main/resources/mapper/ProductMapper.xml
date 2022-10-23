@@ -1,3 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="bit.data.dao.ProductDao">
+	<select id="getFriendWishlist" parameterType="int" resultType="productDto">
+		select * from product where num in (select productNum from wishlist where userNum=${userNum} and publicOption=1)
+	</select>
+	
+	<select id="getCart" parameterType="int" resultType="productDto">
+		select num,name,price,thumbnailImageUrl,brand from product where num in (select productNum from cartList where userNum=#{userNum})
+	</select>
+	
+	<!-- 가격별 인기상품 -->
+	<select id="selectProductByPrice" parameterType="int" resultType="productDto">
+		select * from product 
+		<if test="price==1">
+		 	 where price &lt;= 50000 
+		</if>
+		<if test="price==2">
+		 	 where price &gt; 50000  and price &lt;=100000
+		</if>
+		<if test="price==3">
+		 	 where price &gt; 100000 and price &lt;=200000 
+		</if>
+		<if test="price==4">
+		 	 where price &gt; 200000
+		</if> 
+		order by readcount desc limit 4			
+	</select>
+	
+	<!-- 테마별 -->
+	<select id="selectProductByTheme" parameterType="int" resultType="productDto">
+		select * from product where num in (select productNum from themeProduct where themeNum=#{themeNum})
+	</select>
+	
+	<!-- 태그 -->
+	<select id="selectTagByTheme" parameterType="int" resultType="themeDto">
+		select * from theme where num=#{themeNum} 
+	</select>
+	
+	<!-- 상세페이지 -->
+	<select id="selectProductDetail" parameterType="int" resultType="productDto">
+		select * from product where num=#{num}
+	</select>
+		
+	<!-- 카테고리전체 -->
+   <select id="getCategory" resultType="categoryDto">
+      select * from category order by num asc
+   </select>
+   
+   <!-- 카테고리명 by num -->
+   <select id="getCategoryByNum" parameterType="int" resultType="String">
+      select name from category where num=#{categoryNum}
+   </select>
+   
+   <!-- 카테고리에 해당하는 상품들 갯수 -->
+   <select id="getTotalProductByCateNum" parameterType="int" resultType="int">
+      select count(*) from product where categoryNum=#{categoryNum}
+   </select>
+   
+   <!-- 정렬 -->
+   <select id="getProductByNum" parameterType="map" resultType="productDto">
+      select * from product where categoryNum=#{categoryNum} order by ${sort}
+   </select>
+	
+	<!-- 조회수 -->
+	<update id="updateReadCount" parameterType="int">
+		update product set readcount=readcount+1 where num=#{num}
+	</update>
+	<!-- 마이페이지 리뷰 작성가능한 상품목록 -->
+	<select id="selectWriteableList" parameterType="int" resultType="productDto">
+		select * from product where num in (select o.productNum from orderDetail o left join review r on o.productNum = r.productNum where r.productNum is null and o.userNum=#{userNum})
+	</select>
+	
+	
+	
+	
+	
+	
+	<!-- 검색에 해당하는 상품 갯수 -->
+	<select id="getSearchCount" parameterType="String" resultType="int">
+		select count(*) from product where name like concat('%',#{searchword},'%')
+		 or brand like concat('%',#{searchword},'%')
+	</select>
+	
+	<!-- 검색에 해당하는 상품 리스트 -->
+	<!-- 
+	<select id="getSearchProduct" parameterType="String" resultType="productDto">
+		select * from product where name like concat('%',#{searchword},'%')
+		 or brand like concat('%',#{searchword},'%') order by createdAt desc
+	</select>
+	 -->
+	 
+	<!-- 검색에 해당하는 상품 리스트 정렬 -->
+	<select id="getSearchProductBySort" parameterType="map" resultType="productDto">
+		select * from product where name like concat('%',#{searchword},'%')
+		 or brand like concat('%',#{searchword},'%') order by ${sort}
+	</select>
+
+
+</mapper>
+

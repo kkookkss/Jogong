@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bit.data.dao.OrderDao">
+	<!-- order 데이터 전체 조회  -->
+	<select id="getAllSearch">
+		select * from order 
+	</select>
+
+	<!-- order에 필요한 상품 정보 조회 -->
+	<select id="getItemSearch" parameterType="int" resultType="productDto">
+		select
+		p.name, p.price, p.thumbnailImageUrl,
+		o.shoesSize, o.clothSize
+		from orderDetail d 
+		inner join jogong.option o
+		on d.optionNum = o.num
+		inner join product p
+		on d.productNum = p.num
+		where d.num = #{num}; 
+	</select>
+
+	<!-- order에 필요한 친구 nickname 조회 -->
+	<select id="getfriendNickNameSearch" parameterType="int" resultType="String">
+		select nickname from user where num in (select friendNum from orderDetail where num = #{num})
+	</select>
+
+	<!-- order에 필요한 nickname, point 조회 -->
+	<select id="getUserSearch" parameterType="int" resultType="userDto">
+		select nickname,point from user where  num = (select userNum from orderDetail where num = #{num})
+	</select>
+
+	<!-- order에 필요한 orderdetail 조회 -->
+	<select id="getOrderDetail" parameterType="int" resultType="orderDetailDto">
+		select num,qty,userNum,friendNum,productNum from orderDetail where  num = #{num}
+	</select>
+	
+	<!-- order 정보 insert -->
+	<insert id="insertOrder">
+	      insert into jogong.order values (null,#{imp_uid},#{totalPrice},now(),#{pg},#{pay_method},#{paidPoint},#{deliveryAddress},#{orderStatus},#{deliveryCharge},#{messagecard},#{banner},#{message},#{hp},#{count},#{postalcode},#{userNum},#{orderDetailNum},#{friendNum},#{productNum})
+	</insert>
+</mapper>

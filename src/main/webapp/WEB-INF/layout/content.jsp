@@ -21,6 +21,11 @@
     <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
     
 </head>
+<style>
+	.body{
+		min-height:600px;
+	}
+</style>
 <body>
 	<div>
 		content

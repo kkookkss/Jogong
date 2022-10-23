@@ -4,6 +4,31 @@
        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
 <tiles-definitions>
 	
+	<!-- loginSearch layout -->
+	<definition name="loginSearch" template="/WEB-INF/loginPopup/loginLayout.jsp">
+		<put-attribute name="content" value="/WEB-INF/loginPopup/content.jsp"/>
+	</definition>
+	
+	<!-- loginSearch macro -->
+	<definition name="/bit/loginPopup/*" extends="loginSearch">
+		<put-attribute name="content" value="/WEB-INF/loginPopup/{1}.jsp"/>
+		
+	</definition>
+	
+	
+	<!-- my -->
+ 	<definition name="myLayout" template="/WEB-INF/mylayout/myLayout.jsp">
+		<put-attribute name="header" value="/WEB-INF/layout/header.jsp"/>
+		<put-attribute name="menu" value="/WEB-INF/mylayout/menu.jsp"/>
+		<put-attribute name="myContent" value="/WEB-INF/mylayout/myContent.jsp"/>
+		<put-attribute name="footer" value="/WEB-INF/layout/footer.jsp"/>	
+	</definition>
+	
+	<!-- my -->
+	<definition name="/mypage/*/*" extends="myLayout">
+		<put-attribute name="myContent" value="/WEB-INF/{1}/{2}.jsp"/>
+	</definition>
+	
 	<!-- layout -->
 	<definition name="layout" template="/WEB-INF/layout/layout.jsp">
 		<put-attribute name="header" value="/WEB-INF/layout/header.jsp"/>
@@ -30,4 +55,19 @@
 	<definition name="/bit/main/main" extends="main">
 		<put-attribute name="main" value="/WEB-INF/{1}/{2}.jsp"/>
 	</definition>
+	
+	<!-- notice -->
+	<definition name="notice" template="/WEB-INF/notice/noticelayout.jsp">
+		<put-attribute name="content" value="/WEB-INF/notice/content.jsp"/>
+	</definition>
+	
+	<!-- notice macro -->
+	<definition name="/bit/cscenter/notice" extends="notice">
+		<put-attribute name="content" value="/WEB-INF/cscenter/notice.jsp"/>
+	</definition>
+	
+	
+
+	
+	
 </tiles-definitions>
